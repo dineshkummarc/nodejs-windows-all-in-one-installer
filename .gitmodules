@@ -22,3 +22,22 @@
 [submodule "node_modules/ejs"]
 	path = node_modules/ejs
 	url = git://github.com/visionmedia/ejs.git
+[submodule "node_modules/websocket-server"]
+	path = node_modules/websocket-server
+	url = http://github.com/miksago/node-websocket-server.git
+[submodule "node_modules/paperboy"]
+	path = node_modules/paperboy
+	url = git://github.com/felixge/node-paperboy.git
+[submodule "node_modules/socket.io"]
+	path = node_modules/socket.io
+	url = git://github.com/LearnBoost/socket.io.git
+[submodule "node_modules/socket.io-client"]
+	path = node_modules/socket.io-client
+	url = git://github.com/LearnBoost/socket.io-client.git
+[submodule "node_modules/uglify-js"]
+	path = node_modules/uglify-js
+	url = git://github.com/mishoo/UglifyJS.git
+
+[submodule "node_modules/node-inspector"]
+	path = node_modules/node-inspector
+	url = git://github.com/dannycoates/node-inspector.git

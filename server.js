@@ -2,22 +2,15 @@
  * @author sidney.filho
  */
 
-var express = require("express"), app = express.createServer();
+/* Declaring variables */
+var express = require("express");
+var app = express.createServer();
+app.port = process.argv[process.argv.length - 1];
 
+/*  */
 app.all("*", function(req, res) {
 	res.send("Hello Teste! <br/> Path Accessed: " + req.params)
 });
 
-//
-try {
-	app.listen(process.env.PORT || 8008);
-} catch (e) {
-
-}
-
-// teste
-function teste() {
-	window.jQuery && document.write();
-	
-	
-}
+/*  */
+app.listen(app.port || 8008);
