@@ -1,6 +1,7 @@
 {
 	"Default Web Site" : {
-		"path" : "wwwroot"
+		"path" : "~\\wwwroot",
+		"hosts" : ["localhost"]
 	}
 }
 
