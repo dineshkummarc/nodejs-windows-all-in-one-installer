@@ -1,1 +1,1 @@
-nssm remove "NodeJS" confirm
+NSSM remove "NodeJS" confirm
