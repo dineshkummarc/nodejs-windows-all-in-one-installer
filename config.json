@@ -1,2 +1,7 @@
-{	"Default Web Site": {		path:".\wwwroot"}}
+{
+	"Default Web Site" : {
+		"path" : "wwwroot"
+	}
+}
 
+ 
