@@ -20,7 +20,7 @@ exports.PostsController = function (app, express) {
 	
 	 */
 	
-	//app.remove("/teste");
-	app.all("/teste", function (req, res) {	res.send("Hello Teste! <br/> <h1>TESTE</h1>");	}); 
+	app.remove("/teste");
+	//app.all("/teste", function (req, res) {	res.send("Hello Teste! <br/> <h1>TESTE</h1>");	}); 
 }
  
