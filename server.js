@@ -9,89 +9,100 @@ cp = require("child_process"),
 express = require("express"),
 app = express.createServer();
 
-/* Identifing is Debuggable */
-process.isDebuggable = process.env.isDebuggable || process.env.NODE_ENV === "Development" || process.argv.join('').indexOf('--debug') > 0;
-
-/**
- * read config file
- */
-var configFilePath = path.join(__dirname, 'config.json');
-app.config = JSON.parse(fs.readFileSync(configFilePath, "utf8"));
-console.log(app.config);
-
 /*
  **  Watch folders
  */
-function watchAllNodeFiles(app, targetPath) {
+function reloadAllNodeModules(app, targetPath) {
+	var
+	entry,
+	target,
+	stats = fs.statSync(targetPath),
 	targetPath = path.resolve(targetPath);
-	var stats = fs.statSync(targetPath);
 	
 	if (stats.isDirectory()) {
+		
 		fs.readdirSync(targetPath).forEach(function (fileName) {
-				watchAllNodeFiles(app, targetPath + '/' + fileName);
-			});
+			reloadAllNodeModules(app, targetPath + '/' + fileName);
+		});
 		
-	} else if (/.*\.(node|jsx|njs)/.test(targetPath)) {
+	} else if (/\.(node|jsx|njs)$/.test(targetPath)) {
 		
-		delete(require.cache[targetPath]);
-		var entry,
+		delete require.cache[targetPath];
 		target = require(targetPath);
 		for (entry in target) {
 			if (target.hasOwnProperty(entry)) {
 				target[entry](app, express);
 			}
 		}
+		
 	}
 }
 
-function MountAppByPath(targetPath) {
+function mountAppByPath(targetPath) {
+	
 	var tmp = express.createServer();
 	tmp.set('views', targetPath + '/views');
 	tmp.use(express.static(targetPath + '/static'));
-	watchAllNodeFiles(tmp, targetPath);
+	reloadAllNodeModules(tmp, targetPath);
 	return tmp;
+	
 }
 
-function MountApp(entry) {
+function mountApp(entry) {
 	entry.middlewares = [];
-	for (var i = 0; i < entry.hosts.length; i += 1) {
-		var host = entry.hosts[i];
-		
-		app.use(express.vhost(host, MountAppByPath(entry.path)));
-		entry.middlewares.push(app.stack.length - 1); // Save middleware position
-		
-		fs.watch(entry.path, function (action) {
-				for (var i = 0; i < entry.middlewares.length; i++) {
-					app.stack.splice(entry.middlewares[i], 1); // remove item
-				}
-				
-				MountApp(entry);
-				//app.use(host, express.vhost(host, MountAppByPath(entry.path)));
-			});
+	var i = 0;
+	for (i = 0; i < entry.hosts.length; i += 1) {
+		/* Create a vhost to encapsulate the application, in future will changed to a fork*/
+		app.use(express.vhost(entry.hosts[i], mountAppByPath(entry.path)));
+		// Save middleware position
+		entry.middlewares.push(app.stack.length - 1);
 	}
+	
+	fs.watch(entry.path, function (action) {
+		for (i = 0; i < entry.middlewares.length; i += 1) {
+			app.stack.splice(entry.middlewares[i], 1); // remove item to dont use oldies routes
+		}
+		
+		mountApp(entry);
+	});
+	
 }
 
-var entry, i;
-for (entry in app.config) {
-	if (app.config.hasOwnProperty(entry)) {
-		entry = app.config[entry];
-		entry.path = entry.path.replace(/\~/g, __dirname);
-		entry.hosts = entry.hosts || ["localhost"];
-		
-		MountApp(entry);
+function main() {
+	/* Identifing is Debuggable */
+	process.isDebuggable = process.env.isDebuggable || process.env.NODE_ENV === "Development";
+	
+	/**
+	 * read config file
+	 */
+	var configFilePath = path.join(__dirname, 'config.json');
+	app.config = JSON.parse(fs.readFileSync(configFilePath, "utf8"));
+	console.log(app.config);
+	
+	var i = 0,
+	entry = {};
+	
+	for (entry in app.config) {
+		if (app.config.hasOwnProperty(entry)) {
+			entry = app.config[entry];
+			entry.path = entry.path.replace(/\~/g, __dirname);
+			entry.hosts = entry.hosts || ["localhost"];
+			
+			mountApp(entry);
+		}
 	}
-}
-
-/* Start express process */
-app.use(express.cookieParser());
-app.use(express.methodOverride());
-app.set('view engine', 'ejs');
-
-//app.set('views', __dirname + '/views');
-//app.use(express.static(__dirname + '/static'));
-
-app.all("/", function (req, res) {
+	
+	/* Start express process */
+	app.use(express.cookieParser());
+	app.use(express.methodOverride());
+	app.set('view engine', 'ejs');
+	
+	//app.set('views', __dirname + '/views');
+	//app.use(express.static(__dirname + '/static'));
+	
+	app.all("/", function (req, res) {
 		res.send("<h1>Hello World! </h1>");
 	})
-.listen(process.isDebuggable ? 3000 : 80);
- 
+	.listen(process.isDebuggable ? 3000 : 80);
+}
+main();

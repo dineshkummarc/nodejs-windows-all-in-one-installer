@@ -1,3 +1,10 @@
+:: Set a local variable
+SET NODE_PATH=%CD%
+
+:: Set a enviroment variable
+SETX /M "NODE_PATH" "%CD%"
+SETX /M "NODE_ENV" "Development"
+
 :: kill process before opened
 TASKKILL /f /t /fi "imagename eq node*"
 
