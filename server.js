@@ -28,8 +28,8 @@ function watchAllNodeFiles(app, targetPath) {
 	
 	if (stats.isDirectory()) {
 		fs.readdirSync(targetPath).forEach(function (fileName) {
-				watchAllNodeFiles(app, targetPath + '/' + fileName);
-			});
+			watchAllNodeFiles(app, targetPath + '/' + fileName);
+		});
 		
 	} else if (/.*\.(node|jsx|njs)/.test(targetPath)) {
 		
@@ -61,13 +61,13 @@ function MountApp(entry) {
 		entry.middlewares.push(app.stack.length - 1); // Save middleware position
 		
 		fs.watch(entry.path, function (action) {
-				for (var i = 0; i < entry.middlewares.length; i++) {
-					app.stack.splice(entry.middlewares[i], 1); // remove item
-				}
-				
-				MountApp(entry);
-				//app.use(host, express.vhost(host, MountAppByPath(entry.path)));
-			});
+			for (var i = 0; i < entry.middlewares.length; i++) {
+				app.stack.splice(entry.middlewares[i], 1); // remove item
+			}
+			
+			MountApp(entry);
+			//app.use(host, express.vhost(host, MountAppByPath(entry.path)));
+		});
 	}
 }
 
@@ -91,7 +91,6 @@ app.set('view engine', 'ejs');
 //app.use(express.static(__dirname + '/static'));
 
 app.all("/", function (req, res) {
-		res.send("<h1>Hello World! </h1>");
-	})
+	res.send("<h1>Hello World! </h1>");
+})
 .listen(process.isDebuggable ? 3000 : 80);
- 
