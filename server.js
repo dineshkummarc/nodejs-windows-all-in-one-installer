@@ -10,12 +10,12 @@ express = require("express"),
 app = express.createServer();
 
 /* Identifing is Debuggable */
-process.isDebuggable = process.env.isDebuggable || process.env.NODE_ENV === "Development" || process.argv.join('').indexOf('--debug') > 0;
+process.isDebuggable = process.env.isDebuggable || process.env.NODE_ENV === "Development" || process.argv.join("").indexOf("--debug") > 0;
 
 /**
  * read config file
  */
-var configFilePath = path.join(__dirname, 'config.json');
+var configFilePath = path.join(__dirname, "config.json");
 app.config = JSON.parse(fs.readFileSync(configFilePath, "utf8"));
 console.log(app.config);
 
@@ -28,7 +28,7 @@ function watchAllNodeFiles(app, targetPath) {
 	
 	if (stats.isDirectory()) {
 		fs.readdirSync(targetPath).forEach(function (fileName) {
-			watchAllNodeFiles(app, targetPath + '/' + fileName);
+			watchAllNodeFiles(app, targetPath + "/" + fileName);
 		});
 		
 	} else if (/.*\.(node|jsx|njs)/.test(targetPath)) {
@@ -46,8 +46,16 @@ function watchAllNodeFiles(app, targetPath) {
 
 function MountAppByPath(targetPath) {
 	var tmp = express.createServer();
-	tmp.set('views', targetPath + '/views');
-	tmp.use(express.static(targetPath + '/static'));
+	tmp.set("views", targetPath + "/views");
+	tmp.use(express.static(targetPath + "/public"));
+	
+	/* Start express process */
+	tmp.use(express.cookieParser());
+	tmp.use(express.bodyDecoder());
+	tmp.use(express.methodOverride());
+	tmp.use(express.compiler({ src: targetPath + "/public/css", enable: ["less"]}
+	tmp.set("view engine", "ejs");
+
 	watchAllNodeFiles(tmp, targetPath);
 	return tmp;
 }
@@ -82,13 +90,6 @@ for (entry in app.config) {
 	}
 }
 
-/* Start express process */
-app.use(express.cookieParser());
-app.use(express.methodOverride());
-app.set('view engine', 'ejs');
-
-//app.set('views', __dirname + '/views');
-//app.use(express.static(__dirname + '/static'));
 
 app.all("/", function (req, res) {
 	res.send("<h1>Hello World! </h1>");
