@@ -11,9 +11,8 @@ SETX /M "NODE_ENV" "Development"
 SETX /M "NODE_PATH" "%NODE_PATH%"
 SETX /M "PATH" "%PATH%;%%GIT_PATH%%;%%NODE_PATH%%"
 
-
-@REG ADD "HKEY_CURRENT_USER\Software\Classes\joyent.node.js\shell\open\command" /ve /d "%%NODE_PATH%%\node.exe %1" /f
-@REG ADD "HKEY_CURRENT_USER\Software\Classes\.njs" /ve /d "joyent.node.js" /f
+FTYPE NodeJS.File.NJS="%NODE_PATH%\node" "%1"
+ASSOC .NJS=NodeJS.File.NJS
 
 
 :: install and start the service
