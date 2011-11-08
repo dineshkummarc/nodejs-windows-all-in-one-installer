@@ -41,3 +41,6 @@
 [submodule "node_modules/node-inspector"]
 	path = node_modules/node-inspector
 	url = git://github.com/dannycoates/node-inspector.git
+[submodule "node_modules/npm"]
+	path = node_modules/npm
+	url = git://github.com/isaacs/npm.git
