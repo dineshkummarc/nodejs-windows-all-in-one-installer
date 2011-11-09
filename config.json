@@ -1,8 +1,0 @@
-{
-	"Default Web Site" : {
-		"path" : "~\\wwwroot",
-		"hosts" : ["localhost"]
-	}
-}
-
- 
